@@ -38,9 +38,12 @@ RUN if [ -n "$OPENCLAW_INSTALL_BROWSER" ]; then \
 
 COPY . .
 RUN pnpm build
+# Optionally skip the control UI build for headless gateway deployments.
+# Build with: docker build --build-arg OPENCLAW_SKIP_UI_BUILD=1 ...
+ARG OPENCLAW_SKIP_UI_BUILD=""
 # Force pnpm for UI build (Bun may fail on ARM/Synology architectures)
 ENV OPENCLAW_PREFER_PNPM=1
-RUN pnpm ui:build
+RUN if [ -z "$OPENCLAW_SKIP_UI_BUILD" ]; then pnpm ui:build; fi
 
 ENV NODE_ENV=production
 
